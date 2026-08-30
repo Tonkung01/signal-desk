@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ชี้ช่องรวย by โค้ชต้น💰</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F3F5F8;
+    --bg-2: #EAEDF2;
+    --panel: #FFFFFF;
+    --panel-2: #F6F8FA;
+    --line: #E1E5EB;
+    --text: #151B26;
+    --muted: #667085;
+    --faint: #98A2B3;
+    --gold: #B7791F;
+    --gold-soft: #FBF0DC;
+    --gold-border: #EFD9AC;
+    --gold-text: #7A5717;
+    --buy: #059669;
+    --buy-bg: #E7F6EF;
+    --buy-border: #BFE6D4;
+    --sell: #DC2626;
+    --sell-bg: #FDEBEB;
+    --sell-border: #F3B4B4;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  :root[data-theme="dark"]{
+    --bg: #0D1117;
+    --bg-2: #10151C;
+    --panel: #161B22;
+    --panel-2: #1C232C;
+    --line: #262E38;
+    --text: #E7ECF2;
+    --muted: #8B93A1;
+    --faint: #5B6472;
+    --gold: #E8A33D;
+    --gold-soft: rgba(232,163,61,0.12);
+    --gold-border: rgba(232,163,61,0.35);
+    --gold-text: #E8A33D;
+    --buy: #34D399;
+    --buy-bg: rgba(52,211,153,0.12);
+    --buy-border: rgba(52,211,153,0.35);
+    --sell: #F87171;
+    --sell-bg: rgba(248,113,113,0.12);
+    --sell-border: rgba(248,113,113,0.35);
+  }
+  :root[data-theme="dark"] .btn.primary{color:#1A1206;}
+  *{box-sizing:border-box;}
+  html{font-size:17px;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font-body);transition:background-color .2s, color .2s;}
+  body{min-height:100vh;line-height:1.5;background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 42px 42px;
+    background-position: -1px -1px;
+    background-color: var(--bg);
+  }
+  .wrap{max-width:1220px;margin:0 auto;padding:0 20px 60px;}
+
+  /* Header */
+  header{padding:30px 0 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;border-bottom:1px solid var(--line);}
+  .brand{display:flex;align-items:baseline;gap:10px;}
+  .brand .mark{width:11px;height:11px;border-radius:2px;background:var(--gold);display:inline-block;transform:rotate(45deg);}
+  .brand h1{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:0.3px;margin:0;color:var(--text);}
+  .brand .sub{font-family:var(--font-mono);font-size:13px;color:var(--faint);letter-spacing:1.5px;text-transform:uppercase;}
+  .head-actions{display:flex;gap:10px;align-items:center;}
+  .mode-pill{font-family:var(--font-mono);font-size:13px;padding:7px 12px;border-radius:20px;border:1px solid var(--line);color:var(--muted);letter-spacing:0.5px;background:var(--panel);}
+  .mode-pill.live{color:var(--buy);border-color:var(--buy-border);background:var(--buy-bg);}
+  .mode-pill.demo{color:var(--gold);border-color:var(--gold-border);background:var(--gold-soft);}
+  button{font-family:var(--font-body);cursor:pointer;}
+  .btn{background:var(--panel);border:1px solid var(--line);color:var(--text);padding:10px 16px;border-radius:8px;font-size:15px;font-weight:500;transition:border-color .15s, background .15s;}
+  .btn:hover{border-color:var(--gold);background:var(--gold-soft);}
+  .btn.primary{background:var(--gold);color:#fff;border-color:var(--gold);font-weight:600;}
+  .btn.primary:hover{background:#a06a19;}
+  .btn:focus-visible, input:focus-visible, select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+
+  /* Ticker tape */
+  .ticker{overflow:hidden;white-space:nowrap;border-bottom:1px solid var(--line);background:var(--panel);}
+  .ticker-inner{display:inline-block;padding:10px 0;animation:scroll 38s linear infinite;font-family:var(--font-mono);font-size:14.5px;}
+  .ticker:hover .ticker-inner{animation-play-state:paused;}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  .tick-item{display:inline-block;padding:0 20px;color:var(--muted);border-right:1px solid var(--line);}
+  .tick-item b{color:var(--text);margin-right:6px;}
+  .tick-up{color:var(--buy);} .tick-down{color:var(--sell);}
+
+  /* Disclaimer */
+  .disclaimer{margin-top:16px;padding:14px 18px;border:1px solid var(--gold-border);background:var(--gold-soft);border-radius:10px;font-size:14.5px;color:var(--gold-text);line-height:1.6;}
+  .disclaimer b{color:var(--gold);}
+
+  /* Grid */
+  .section-label{font-family:var(--font-mono);font-size:12.5px;letter-spacing:2px;text-transform:uppercase;color:var(--faint);margin:32px 0 14px;}
+  .category-section{margin-bottom:28px;}
+  .category-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 2px;border-bottom:1px solid var(--line);margin-bottom:14px;user-select:none;}
+  .category-header:hover .category-title{color:var(--gold);}
+  .category-title{font-family:var(--font-display);font-weight:600;font-size:16.5px;display:flex;align-items:center;gap:8px;color:var(--text);transition:color .15s;}
+  .category-title .chevron{transition:transform .2s;color:var(--faint);flex-shrink:0;}
+  .category-section.collapsed .chevron{transform:rotate(-90deg);}
+  .category-count{font-family:var(--font-mono);font-size:12px;color:var(--faint);background:var(--panel-2);padding:3px 10px;border-radius:20px;border:1px solid var(--line);}
+  .category-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(295px,1fr));gap:16px;}
+  .category-section.collapsed .category-grid{display:none;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;position:relative;overflow:visible;transition:border-color .2s, box-shadow .2s;box-shadow:0 1px 2px rgba(16,24,40,0.04);}
+  .card.signal-buy{border-color:var(--buy-border);box-shadow:0 0 0 3px var(--buy-bg);}
+  .card.signal-sell{border-color:var(--sell-border);box-shadow:0 0 0 3px var(--sell-bg);}
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .id-block{display:flex;align-items:center;gap:12px;}
+
+  /* Icon badges */
+  .icon-badge{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:visible;position:relative;}
+  .icon-badge svg{width:24px;height:24px;display:block;}
+  .icon-badge.round{background:transparent!important;}
+  .icon-badge.round svg{width:42px;height:42px;}
+  .icon-badge.logo-badge{background:#fff;border:1px solid var(--line);padding:7px;}
+  .icon-badge.logo-badge img{width:100%;height:100%;object-fit:contain;display:block;}
+  .icon-badge.logo{background:#fff;border:1px solid var(--line);}
+  .icon-badge.logo img{width:26px;height:26px;object-fit:contain;border-radius:4px;}
+  .icon-badge.flagpair{background:transparent;}
+  .flag-circle{position:absolute;width:25px;height:25px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #fff, 0 0 0 3px var(--line);overflow:hidden;line-height:0;}
+  .flag-circle svg{width:100%;height:100%;display:block;}
+  .flag-front{left:0;top:12px;z-index:2;}
+  .flag-back{left:15px;top:0;z-index:1;}
+
+  .card-top .id{font-family:var(--font-display);font-weight:700;font-size:18px;line-height:1.25;}
+  .card-top .name{font-size:13px;color:var(--faint);}
+  .price{font-family:var(--font-mono);font-size:29px;font-weight:600;margin-top:14px;color:var(--text);}
+  .delta{font-family:var(--font-mono);font-size:14.5px;margin-top:3px;}
+  .delta.up{color:var(--buy);} .delta.down{color:var(--sell);}
+  canvas.spark{width:100%;height:78px;display:block;margin-top:12px;}
+  .card-datetime{font-family:var(--font-mono);font-size:11px;color:var(--faint);margin-top:6px;}
+  .tf-row{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;}
+  .tf-btn{font-family:var(--font-mono);font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
+  .tf-btn:hover{border-color:var(--gold);}
+  .tf-btn.active{background:var(--gold);color:#fff;border-color:var(--gold);}
+  .meta-row{display:flex;gap:12px;margin-top:10px;font-family:var(--font-mono);font-size:13.5px;color:var(--muted);}
+  .meta-row span b{color:var(--text);}
+  .sig-box{margin-top:14px;padding:12px 14px;border-radius:10px;background:var(--panel-2);border:1px dashed var(--line);font-size:14px;color:var(--faint);}
+  .sig-box.active{border-style:solid;}
+  .sig-box.buy{background:var(--buy-bg);border-color:var(--buy-border);color:var(--text);}
+  .sig-box.sell{background:var(--sell-bg);border-color:var(--sell-border);color:var(--text);}
+  .sig-head{font-family:var(--font-mono);font-weight:700;letter-spacing:0.5px;font-size:14px;display:flex;align-items:center;gap:6px;}
+  .sig-head.buy{color:var(--buy);} .sig-head.sell{color:var(--sell);}
+  .sig-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;font-family:var(--font-mono);}
+  .sig-grid div span{display:block;color:var(--faint);font-size:11px;text-transform:uppercase;letter-spacing:0.5px;}
+  .sig-grid div b{font-size:14.5px;color:var(--text);}
+
+  /* Panels row */
+  .panels{display:grid;grid-template-columns:1.1fr 1.4fr;gap:16px;margin-top:36px;}
+  @media(max-width:860px){.panels{grid-template-columns:1fr;}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 20px 22px;box-shadow:0 1px 2px rgba(16,24,40,0.04);}
+  .panel h3{font-family:var(--font-display);font-size:17px;margin:0 0 5px;color:var(--text);}
+  .panel p.hint{font-size:14px;color:var(--faint);margin:0 0 16px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:13.5px;color:var(--muted);margin-bottom:6px;}
+  .field input, .field select{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);padding:10px 12px;border-radius:8px;font-family:var(--font-mono);font-size:14.5px;}
+  .toggle-row{display:flex;gap:8px;margin-bottom:16px;}
+  .toggle-row .btn{flex:1;text-align:center;}
+  .toggle-row .btn.active{background:var(--gold);color:#fff;border-color:var(--gold);}
+  .status-line{font-size:13.5px;color:var(--faint);margin-top:10px;font-family:var(--font-mono);min-height:18px;}
+  .status-line.ok{color:var(--buy);}
+  .status-line.err{color:var(--sell);}
+  .btn-row{display:flex;gap:8px;margin-top:4px;}
+
+  /* Log */
+  .log{max-height:360px;overflow-y:auto;padding-right:4px;}
+  .log-empty{color:var(--faint);font-size:14px;padding:22px 0;text-align:center;}
+  .log-item{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line);}
+  .log-item:last-child{border-bottom:none;}
+  .log-dot{width:9px;height:9px;border-radius:50%;margin-top:6px;flex-shrink:0;}
+  .log-dot.buy{background:var(--buy);} .log-dot.sell{background:var(--sell);}
+  .log-body{font-size:14px;line-height:1.5;color:var(--text);}
+  .log-body b{font-family:var(--font-mono);}
+  .log-time{font-family:var(--font-mono);font-size:12.5px;color:var(--faint);margin-left:auto;white-space:nowrap;padding-top:2px;}
+
+  footer{margin-top:42px;text-align:center;font-size:13px;color:var(--faint);font-family:var(--font-mono);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <span class="mark"></span>
+      <div>
+        <h1>ชี้ช่องรวย by โค้ชต้น💰</h1>
+        <div class="sub">Technical Signal Monitor</div>
+      </div>
+    </div>
+    <div class="head-actions">
+      <span class="mode-pill demo" id="modePill">DEMO DATA</span>
+      <button class="btn" id="themeBtn">🌙 Dark Mode</button>
+      <button class="btn" id="notifBtn">เปิดแจ้งเตือนเบราว์เซอร์</button>
+    </div>
+  </header>
+
+  <div class="ticker"><div class="ticker-inner" id="tickerInner">กำลังโหลด...</div></div>
+
+  <div class="disclaimer">
+    <b>ข้อจำกัด:</b> โหมด Demo ใช้ราคาจำลอง (ไม่ใช่ราคาจริงจาก Exness) เพื่อสาธิตการทำงานของระบบ สลับเป็นโหมด Live ด้านล่างและใส่ API key ของผู้ให้บริการข้อมูลตลาดเพื่อดึงราคาตลาดจริง (ใกล้เคียงราคา Exness เพราะอ้างอิงตลาดเดียวกัน แต่ไม่การันตีตรงกันทุกจุดทศนิยม) สัญญาณที่แสดงคำนวณจากอินดิเคเตอร์ทางเทคนิคตามกฎที่ตั้งไว้เท่านั้น <b>ไม่ใช่คำแนะนำการลงทุน</b> โปรดบริหารความเสี่ยงด้วยตนเอง
+  </div>
+
+  <div class="section-label">Instruments</div>
+  <div id="grid"></div>
+
+  <div class="panels">
+    <div class="panel">
+      <h3>ตั้งค่าแหล่งข้อมูลและการแจ้งเตือน</h3>
+      <p class="hint">ตั้งค่าถูกเก็บไว้ในเบราว์เซอร์นี้เท่านั้น (ไม่ส่งให้ใคร) — ระวังการแชร์หน้าจอเมื่อกรอกโทเคน</p>
+
+      <div class="toggle-row">
+        <button class="btn active" id="btnDemo">โหมด Demo</button>
+        <button class="btn" id="btnLive">โหมด Live</button>
+      </div>
+
+      <div id="liveFields" style="display:none;">
+        <div class="field">
+          <label>TwelveData API Key (twelvedata.com — มีแผนฟรี)</label>
+          <input type="password" id="tdKey" placeholder="วาง API key ที่นี่">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Telegram Bot Token</label>
+        <input type="password" id="tgToken" placeholder="เช่น 123456789:AAExxxxx...">
+      </div>
+      <div class="field">
+        <label>Telegram Chat ID</label>
+        <input type="text" id="tgChat" placeholder="เช่น 123456789 หรือ -1001234567890">
+      </div>
+      <div class="field">
+        <label>CORS Proxy URL (จำเป็นสำหรับส่ง Telegram จากหน้าเว็บนี้)</label>
+        <input type="text" id="corsProxy" placeholder="เช่น https://your-worker.workers.dev">
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="saveSettings">บันทึกการตั้งค่า</button>
+        <button class="btn" id="testTelegram">ทดสอบส่งข้อความ</button>
+      </div>
+      <div class="status-line" id="settingsStatus"></div>
+
+      <div class="field" style="margin-top:18px;">
+        <label>รอบเวลาสร้างแท่งเทียนใหม่ (โหมด Demo) / รอบดึงข้อมูล (โหมด Live)</label>
+        <select id="intervalSel">
+          <option value="4000">ทุก 4 วินาที (เดโม, เร็ว)</option>
+          <option value="15000" selected>ทุก 15 วินาที</option>
+          <option value="60000">ทุก 60 วินาที</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>ประวัติสัญญาณ</h3>
+      <p class="hint">รายการสัญญาณที่ระบบตรวจพบ เรียงล่าสุดก่อน</p>
+      <div class="log" id="log"><div class="log-empty">ยังไม่มีสัญญาณ — ระบบกำลังเฝ้าดูตลาด</div></div>
+    </div>
+  </div>
+
+  <footer>ชี้ช่องรวย by โค้ชต้น💰 · EMA(9/21) crossover + RSI(14) + ADX(14) + EMA(50) trend filter · ATR(14) for TP/SL · ไม่ใช่คำแนะนำการลงทุน</footer>
+</div>
+
+<script>
+// ---------- Storage abstraction ----------
+// window.storage only exists inside Claude.ai artifacts. When this file is
+// opened directly (file://, hosted elsewhere, etc.), fall back to the
+// browser's own localStorage so settings still persist.
+const appStorage = (window.storage && typeof window.storage.get === 'function')
+  ? window.storage
+  : {
+      async get(key){
+        try{
+          const v = localStorage.getItem(key);
+          return v!=null ? {key, value:v} : null;
+        }catch(e){ return null; } // e.g. storage disabled/blocked
+      },
+      async set(key, value){
+        try{
+          localStorage.setItem(key, value);
+          return {key, value};
+        }catch(e){ return null; }
+      },
+    };
+
+// ---------- Icon SVGs (universal / generic symbols, no brand logos) ----------
+const SVG_GOLDBAR = `<svg viewBox="0 0 24 16" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#FDE7A8"/><stop offset="55%" stop-color="#E4A83B"/><stop offset="100%" stop-color="#AD7A1E"/>
+  </linearGradient></defs>
+  <polygon points="2,14 5,2 19,2 22,14" fill="url(#goldGrad)" stroke="#8A6A16" stroke-width="0.8"/>
+</svg>`;
+const SVG_SILVERBAR = `<svg viewBox="0 0 24 16" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="silverGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#F6F7F9"/><stop offset="55%" stop-color="#C7CCD3"/><stop offset="100%" stop-color="#8B93A1"/>
+  </linearGradient></defs>
+  <polygon points="2,14 5,2 19,2 22,14" fill="url(#silverGrad)" stroke="#5B6472" stroke-width="0.8"/>
+</svg>`;
+const SVG_BTC = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="12" cy="12" r="11" fill="#F7931A"/>
+  <text x="12" y="16.5" font-size="13" font-weight="700" fill="#fff" text-anchor="middle" font-family="Arial, sans-serif">B</text>
+</svg>`;
+const SVG_ETH = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="12" cy="12" r="11" fill="#627EEA"/>
+  <polygon points="12,4.5 17.5,12 12,15.2 6.5,12" fill="#fff" opacity="0.92"/>
+  <polygon points="12,16.3 17.5,13.2 12,19.5 6.5,13.2" fill="#fff" opacity="0.65"/>
+</svg>`;
+const SVG_BARCHART = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+  <rect x="3" y="12" width="4.5" height="9" rx="1"/>
+  <rect x="10" y="6" width="4.5" height="15" rx="1"/>
+  <rect x="17" y="2" width="4.5" height="19" rx="1"/>
+</svg>`;
+const SVG_CANDLES = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" fill="currentColor">
+  <line x1="6" y1="2" x2="6" y2="22" stroke-width="1.5"/><rect x="4" y="8" width="4" height="6" rx="0.8" stroke="none"/>
+  <line x1="12" y1="1" x2="12" y2="23" stroke-width="1.5"/><rect x="10" y="4" width="4" height="11" rx="0.8" stroke="none"/>
+  <line x1="18" y1="3" x2="18" y2="21" stroke-width="1.5"/><rect x="16" y="10" width="4" height="8" rx="0.8" stroke="none"/>
+</svg>`;
+const SVG_BARREL = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+  <rect x="5" y="3" width="14" height="18" rx="3.5" fill="currentColor"/>
+  <rect x="5" y="8" width="14" height="2" fill="#fff" opacity="0.85"/>
+  <rect x="5" y="14" width="14" height="2" fill="#fff" opacity="0.85"/>
+</svg>`;
+
+function handleLogoError(imgEl){
+  const badge = imgEl.parentElement;
+  const bg = badge.dataset.fallbackBg || '#EEF0F3';
+  const fg = badge.dataset.fallbackFg || '#5B6472';
+  const mono = badge.dataset.mono || '?';
+  badge.className = 'icon-badge';
+  badge.style.background = bg;
+  badge.style.border = 'none';
+  badge.style.padding = '0';
+  badge.innerHTML = `<span style="font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-0.3px;color:${fg};">${mono}</span>`;
+}
+function iconHTML(icon){
+  switch(icon.type){
+    case 'goldbar': return `<div class="icon-badge" style="background:#FBF0DC;">${SVG_GOLDBAR}</div>`;
+    case 'silverbar': return `<div class="icon-badge" style="background:#EEF0F3;">${SVG_SILVERBAR}</div>`;
+    case 'btc': return `<div class="icon-badge round">${SVG_BTC}</div>`;
+    case 'eth': return `<div class="icon-badge round">${SVG_ETH}</div>`;
+    case 'index': return `<div class="icon-badge" style="background:${icon.bg};color:${icon.fg};">${SVG_BARCHART}</div>`;
+    case 'oil': return `<div class="icon-badge" style="background:${icon.bg};color:${icon.fg};">${SVG_BARREL}</div>`;
+    case 'stock': return `<div class="icon-badge" style="background:${icon.bg};color:${icon.fg};">${SVG_CANDLES}</div>`;
+    case 'logo': return `<div class="icon-badge logo-badge" data-fallback-bg="${icon.bg}" data-fallback-fg="${icon.fg}" data-mono="${icon.mono}"><img src="https://www.google.com/s2/favicons?sz=128&domain=${icon.domain}" alt="${icon.domain}" onerror="handleLogoError(this)"></div>`;
+    case 'flagpair': return `<div class="icon-badge flagpair"><span class="flag-circle flag-back">${icon.quote}</span><span class="flag-circle flag-front">${icon.base}</span></div>`;
+    case 'numcircle': return `<div class="icon-badge" style="background:${icon.bg};border-radius:50%;"><span style="color:${icon.fg};font-family:var(--font-display);font-weight:800;font-size:15px;letter-spacing:-0.5px;">${icon.value}</span></div>`;
+    default: return `<div class="icon-badge">?</div>`;
+  }
+}
+
+// ---------- Instrument config ----------
+const FLAG = {
+  USD: `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><clipPath id="c-usd"><circle cx="30" cy="30" r="30"/></clipPath><g clip-path="url(#c-usd)">
+    <rect width="60" height="60" fill="#fff"/>
+    ${[0,1,2,3,4,5,6].map(i=>`<rect y="${i*60/13*2}" width="60" height="${60/13}" fill="#B22234"/>`).join('')}
+    <rect width="26" height="32" fill="#3C3B6E"/>
+  </g></svg>`,
+  EUR: `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><clipPath id="c-eur"><circle cx="30" cy="30" r="30"/></clipPath><g clip-path="url(#c-eur)">
+    <rect width="60" height="60" fill="#003399"/>
+    ${Array.from({length:12}).map((_,i)=>{const a=(i/12)*2*Math.PI-Math.PI/2;const x=30+18*Math.cos(a),y=30+18*Math.sin(a);return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4" fill="#FFCC00"/>`}).join('')}
+  </g></svg>`,
+  GBP: `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><clipPath id="c-gbp"><circle cx="30" cy="30" r="30"/></clipPath><g clip-path="url(#c-gbp)">
+    <rect width="60" height="60" fill="#00247D"/>
+    <line x1="0" y1="0" x2="60" y2="60" stroke="#fff" stroke-width="11"/>
+    <line x1="60" y1="0" x2="0" y2="60" stroke="#fff" stroke-width="11"/>
+    <line x1="0" y1="0" x2="60" y2="60" stroke="#CF142B" stroke-width="4.5"/>
+    <line x1="60" y1="0" x2="0" y2="60" stroke="#CF142B" stroke-width="4.5"/>
+    <rect x="24" width="12" height="60" fill="#fff"/>
+    <rect y="24" width="60" height="12" fill="#fff"/>
+    <rect x="26.5" width="7" height="60" fill="#CF142B"/>
+    <rect y="26.5" width="60" height="7" fill="#CF142B"/>
+  </g></svg>`,
+  AUD: `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><clipPath id="c-aud"><circle cx="30" cy="30" r="30"/></clipPath><g clip-path="url(#c-aud)">
+    <rect width="60" height="60" fill="#00247D"/>
+    <rect width="30" height="20" fill="#00247D"/>
+    <line x1="0" y1="0" x2="30" y2="20" stroke="#fff" stroke-width="4"/>
+    <line x1="30" y1="0" x2="0" y2="20" stroke="#fff" stroke-width="4"/>
+    <rect x="12" width="6" height="20" fill="#fff"/>
+    <rect y="7" width="30" height="6" fill="#fff"/>
+    <rect x="13.3" width="3.4" height="20" fill="#CF142B"/>
+    <rect y="8.3" width="30" height="3.4" fill="#CF142B"/>
+    <g fill="#fff">
+      <circle cx="44" cy="14" r="2.6"/>
+      <circle cx="50" cy="30" r="2.2"/>
+      <circle cx="44" cy="44" r="2.6"/>
+      <circle cx="36" cy="36" r="1.8"/>
+      <circle cx="15" cy="42" r="2"/>
+    </g>
+  </g></svg>`,
+  JPY: `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><clipPath id="c-jpy"><circle cx="30" cy="30" r="30"/></clipPath><g clip-path="url(#c-jpy)">
+    <rect width="60" height="60" fill="#fff"/>
+    <circle cx="30" cy="30" r="15" fill="#BC002D"/>
+  </g></svg>`,
+  THB: `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><clipPath id="c-thb"><circle cx="30" cy="30" r="30"/></clipPath><g clip-path="url(#c-thb)">
+    <rect width="60" height="60" fill="#fff"/>
+    <rect y="0"  width="60" height="10" fill="#A51931"/>
+    <rect y="10" width="60" height="10" fill="#fff"/>
+    <rect y="20" width="60" height="20" fill="#2D2A4A"/>
+    <rect y="40" width="60" height="10" fill="#fff"/>
+    <rect y="50" width="60" height="10" fill="#A51931"/>
+  </g></svg>`,
+};
+const INSTRUMENTS = [
+  {id:'XAUUSD', name:'Gold Spot',    tdSymbol:'XAU/USD', base:2512.30, vol:0.0040, dec:2, category:'metals', icon:{type:'goldbar'}},
+  {id:'XAGUSD', name:'Silver Spot',  tdSymbol:'XAG/USD', base:29.40,   vol:0.0055, dec:3, category:'metals', icon:{type:'silverbar'}},
+  {id:'BTCUSD', name:'Bitcoin',      tdSymbol:'BTC/USD', base:65200,   vol:0.0110, dec:0, category:'crypto', icon:{type:'btc'}},
+  {id:'BTCTHB', name:'Bitcoin/Baht', tdSymbol:'BTC/THB', base:2385000, vol:0.0112, dec:0, category:'crypto', icon:{type:'btc'}},
+  {id:'ETHUSD', name:'Ethereum',     tdSymbol:'ETH/USD', base:3450,    vol:0.0130, dec:2, category:'crypto', icon:{type:'eth'}},
+  {id:'EURUSD', name:'Euro / USD',   tdSymbol:'EUR/USD', base:1.08650, vol:0.0018, dec:5, category:'forex', icon:{type:'flagpair', base:FLAG.EUR, quote:FLAG.USD}},
+  {id:'GBPUSD', name:'Pound / USD',  tdSymbol:'GBP/USD', base:1.27150, vol:0.0020, dec:5, category:'forex', icon:{type:'flagpair', base:FLAG.GBP, quote:FLAG.USD}},
+  {id:'AUDUSD', name:'Aussie / USD', tdSymbol:'AUD/USD', base:0.66200, vol:0.0022, dec:5, category:'forex', icon:{type:'flagpair', base:FLAG.AUD, quote:FLAG.USD}},
+  {id:'USDJPY', name:'USD / Yen',    tdSymbol:'USD/JPY', base:155.400, vol:0.0022, dec:3, category:'forex', icon:{type:'flagpair', base:FLAG.USD, quote:FLAG.JPY}},
+  {id:'USDTHB', name:'USD / Baht',   tdSymbol:'USD/THB', base:36.600,  vol:0.0016, dec:3, category:'forex', icon:{type:'flagpair', base:FLAG.USD, quote:FLAG.THB}},
+  {id:'USOIL',  name:'WTI Crude',    tdSymbol:'WTI/USD', base:76.20,   vol:0.0060, dec:2, category:'energy', icon:{type:'oil', bg:'#2A2E35', fg:'#F4B740'}},
+  {id:'SPX500', name:'S&P 500',      tdSymbol:'SPX',     base:5580.0,  vol:0.0030, dec:1, category:'indices', icon:{type:'numcircle', value:'500', bg:'#DC2626', fg:'#FFFFFF'}},
+  {id:'NAS100', name:'Nasdaq 100',   tdSymbol:'IXIC',    base:19750.0, vol:0.0040, dec:1, category:'indices', icon:{type:'numcircle', value:'100', bg:'#1D8FE1', fg:'#FFFFFF'}},
+  {id:'NVDA',   name:'Nvidia',       tdSymbol:'NVDA',    base:180.0,   vol:0.0055, dec:2, category:'stocks', icon:{type:'logo', domain:'nvidia.com', mono:'N', bg:'#0F3D2A', fg:'#6EE7B7'}},
+  {id:'AAPL',   name:'Apple',        tdSymbol:'AAPL',    base:230.0,   vol:0.0030, dec:2, category:'stocks', icon:{type:'logo', domain:'apple.com', mono:'A', bg:'#2B2F36', fg:'#E5E7EB'}},
+  {id:'MSFT',   name:'Microsoft',    tdSymbol:'MSFT',    base:470.0,   vol:0.0028, dec:2, category:'stocks', icon:{type:'logo', domain:'microsoft.com', mono:'M', bg:'#0D2C4D', fg:'#93C5FD'}},
+  {id:'AMZN',   name:'Amazon',       tdSymbol:'AMZN',    base:225.0,   vol:0.0040, dec:2, category:'stocks', icon:{type:'logo', domain:'amazon.com', mono:'A', bg:'#4A2E05', fg:'#FCD34D'}},
+  {id:'GOOGL',  name:'Alphabet',     tdSymbol:'GOOGL',   base:195.0,   vol:0.0035, dec:2, category:'stocks', icon:{type:'logo', domain:'abc.xyz', mono:'G', bg:'#0D2C4D', fg:'#93C5FD'}},
+  {id:'INTC',   name:'Intel',        tdSymbol:'INTC',    base:35.0,    vol:0.0060, dec:2, category:'stocks', icon:{type:'logo', domain:'intel.com', mono:'I', bg:'#0D2C4D', fg:'#93C5FD'}},
+  {id:'AMD',    name:'AMD',          tdSymbol:'AMD',     base:165.0,   vol:0.0060, dec:2, category:'stocks', icon:{type:'logo', domain:'amd.com', mono:'AMD', bg:'#4A1414', fg:'#FCA5A5'}},
+  {id:'TSM',    name:'TSMC (ADR)',   tdSymbol:'TSM',     base:205.0,   vol:0.0035, dec:2, category:'stocks', icon:{type:'logo', domain:'tsmc.com', mono:'TSM', bg:'#2B2F36', fg:'#E5E7EB'}},
+  {id:'ASML',   name:'ASML (ADR)',   tdSymbol:'ASML',    base:780.0,   vol:0.0035, dec:2, category:'stocks', icon:{type:'logo', domain:'asml.com', mono:'AS', bg:'#4A1414', fg:'#FCA5A5'}},
+  {id:'SNDK',   name:'SanDisk',      tdSymbol:'SNDK',    base:55.0,    vol:0.0070, dec:2, category:'stocks', icon:{type:'logo', domain:'sandisk.com', mono:'SD', bg:'#2B2F36', fg:'#E5E7EB'}},
+  {id:'MU',     name:'Micron',       tdSymbol:'MU',      base:130.0,   vol:0.0065, dec:2, category:'stocks', icon:{type:'logo', domain:'micron.com', mono:'MU', bg:'#0F3D2A', fg:'#6EE7B7'}},
+  {id:'SKHY',   name:'SK Hynix (ADR)', tdSymbol:'SKHY',  base:163.0,   vol:0.0060, dec:2, category:'stocks', icon:{type:'logo', domain:'skhynix.com', mono:'SK', bg:'#2B2F36', fg:'#E5E7EB'}},
+  {id:'SPCX',   name:'SpaceX',       tdSymbol:'SPCX',    base:135.0,   vol:0.0060, dec:2, category:'stocks', icon:{type:'logo', domain:'spacex.com', mono:'SX', bg:'#4A2E05', fg:'#FCD34D'}},
+];
+const CATEGORY_ORDER = ['metals','crypto','forex','energy','indices','stocks'];
+const CATEGORY_LABEL = {
+  metals:  'โลหะมีค่า (Metals)',
+  crypto:  'คริปโต (Crypto)',
+  forex:   'คู่เงิน (Forex)',
+  energy:  'พลังงาน (Energy)',
+  indices: 'ดัชนี (Indices)',
+  stocks:  'หุ้นรายตัว (Stocks)',
+};
+const EMA_FAST=9, EMA_SLOW=21, EMA_TREND=50, RSI_LEN=14, ATR_LEN=14, ADX_LEN=14, ADX_THRESHOLD=20;
+const RR = 2; // reward:risk multiple for TP relative to SL (in ATR units)
+const SL_ATR = 2;
+
+// ---------- Chart timeframe selector ----------
+const TIMEFRAMES = [
+  {key:'1min',  label:'1M',  tdInterval:'1min',  minutes:1},
+  {key:'5min',  label:'5M',  tdInterval:'5min',  minutes:5},
+  {key:'15min', label:'15M', tdInterval:'15min', minutes:15},
+  {key:'30min', label:'30M', tdInterval:'30min', minutes:30},
+  {key:'1h',    label:'1H',  tdInterval:'1h',    minutes:60},
+  {key:'2h',    label:'2H',  tdInterval:'2h',    minutes:120},
+  {key:'4h',    label:'4H',  tdInterval:'4h',    minutes:240},
+  {key:'1day',  label:'1D',  tdInterval:'1day',  minutes:1440},
+];
+const THAI_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function thaiDateTime(d){
+  const be = (d.getFullYear()+543) % 100;
+  const dd = String(d.getDate()).padStart(2,'0');
+  const hh = String(d.getHours()).padStart(2,'0');
+  const mi = String(d.getMinutes()).padStart(2,'0');
+  const ss = String(d.getSeconds()).padStart(2,'0');
+  return `ราคา ณ: ${dd} ${THAI_MONTHS[d.getMonth()]} ${be} - ${hh}:${mi}:${ss} น.`;
+}
+function tickClocks(){
+  const txt = thaiDateTime(new Date());
+  INSTRUMENTS.forEach(cfg=>{
+    const el = document.getElementById('dt-'+cfg.id);
+    if(el) el.textContent = txt;
+  });
+}
+async function fetchLiveBarsInterval(cfg, interval){
+  const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(cfg.tdSymbol)}&interval=${interval}&outputsize=60&apikey=${encodeURIComponent(state.tdKey)}`;
+  const res = await fetch(url);
+  const j = await res.json();
+  if(j.status === 'error' || !j.values) throw new Error(j.message || 'โหลดข้อมูลไม่สำเร็จสำหรับช่วงเวลานี้');
+  return j.values.slice().reverse().map(v=>({o:+v.open,h:+v.high,l:+v.low,c:+v.close}));
+}
+function genDemoChartBars(cfg, tfKey){
+  const tf = TIMEFRAMES.find(t=>t.key===tfKey);
+  const scaledVol = cfg.vol * Math.sqrt(tf.minutes/5); // scale volatility relative to the 5-min baseline
+  return seedBars({...cfg, vol:scaledVol}, 60);
+}
+async function switchTimeframe(cfg, tfKey, rowEl){
+  const rec = state.data[cfg.id];
+  if(!rec) return;
+  rec.chartTF = tfKey;
+  rowEl.querySelectorAll('.tf-btn').forEach(b=> b.classList.toggle('active', b.dataset.tf===tfKey));
+  try{
+    if(state.mode==='live' && state.tdKey){
+      const tf = TIMEFRAMES.find(t=>t.key===tfKey);
+      const bars = await fetchLiveBarsInterval(cfg, tf.tdInterval);
+      drawSpark(cfg.id, bars.map(b=>b.c));
+    } else {
+      const bars = genDemoChartBars(cfg, tfKey);
+      drawSpark(cfg.id, bars.map(b=>b.c));
+    }
+  }catch(e){
+    console.error('timeframe load failed', cfg.id, e);
+  }
+}
+
+let state = {
+  mode: 'demo', // 'demo' | 'live'
+  tdKey: '', tgToken: '', tgChat: '', corsProxy: '',
+  intervalMs: 15000,
+  timer: null,
+  data: {}, // id -> {bars:[{o,h,l,c}], lastSignal: {...} or null}
+  alerts: [],
+};
+
+// ---------- Theme (light/dark) ----------
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('themeBtn');
+  btn.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+}
+async function loadTheme(){
+  let theme = null;
+  try{
+    const r = await appStorage.get('signal-desk-theme');
+    if(r && r.value) theme = r.value;
+  }catch(e){ /* no saved preference yet */ }
+  if(!theme){
+    theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  applyTheme(theme);
+}
+document.getElementById('themeBtn').onclick = async ()=>{
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try{ await appStorage.set('signal-desk-theme', next); }catch(e){ /* ignore save failure */ }
+};
+
+// ---------- Storage ----------
+async function loadSettings(){
+  try{
+    const r = await appStorage.get('signal-desk-settings');
+    if(r && r.value){
+      const s = JSON.parse(r.value);
+      state.mode = s.mode || 'demo';
+      state.tdKey = s.tdKey || '';
+      state.tgToken = s.tgToken || '';
+      state.tgChat = s.tgChat || '';
+      state.corsProxy = s.corsProxy || '';
+      state.intervalMs = s.intervalMs || 15000;
+    }
+  }catch(e){ /* no saved settings yet */ }
+  document.getElementById('tdKey').value = state.tdKey;
+  document.getElementById('tgToken').value = state.tgToken;
+  document.getElementById('tgChat').value = state.tgChat;
+  document.getElementById('corsProxy').value = state.corsProxy;
+  document.getElementById('intervalSel').value = String(state.intervalMs);
+  setMode(state.mode, false);
+}
+async function saveSettings(){
+  state.tdKey = document.getElementById('tdKey').value.trim();
+  state.tgToken = document.getElementById('tgToken').value.trim();
+  state.tgChat = document.getElementById('tgChat').value.trim();
+  state.corsProxy = document.getElementById('corsProxy').value.trim().replace(/\/$/,'');
+  state.intervalMs = Number(document.getElementById('intervalSel').value);
+  try{
+    await appStorage.set('signal-desk-settings', JSON.stringify({
+      mode: state.mode, tdKey: state.tdKey, tgToken: state.tgToken,
+      tgChat: state.tgChat, corsProxy: state.corsProxy, intervalMs: state.intervalMs
+    }));
+    flashStatus('บันทึกการตั้งค่าแล้ว', true);
+  }catch(e){ flashStatus('บันทึกไม่สำเร็จ: '+e.message, false); }
+  restartLoop();
+}
+function flashStatus(msg, ok){
+  const el = document.getElementById('settingsStatus');
+  el.textContent = msg;
+  el.className = 'status-line ' + (ok?'ok':'err');
+  setTimeout(()=>{ el.textContent=''; el.className='status-line'; }, 4000);
+}
+
+// ---------- Mode toggle ----------
+function setMode(mode, restart=true){
+  state.mode = mode;
+  document.getElementById('btnDemo').classList.toggle('active', mode==='demo');
+  document.getElementById('btnLive').classList.toggle('active', mode==='live');
+  document.getElementById('liveFields').style.display = mode==='live' ? 'block' : 'none';
+  const pill = document.getElementById('modePill');
+  pill.textContent = mode==='live' ? 'LIVE DATA' : 'DEMO DATA';
+  pill.className = 'mode-pill ' + (mode==='live'?'live':'demo');
+  if(restart) restartLoop();
+}
+document.getElementById('btnDemo').onclick = ()=> setMode('demo');
+document.getElementById('btnLive').onclick = ()=> setMode('live');
+document.getElementById('saveSettings').onclick = saveSettings;
+
+// ---------- Telegram ----------
+async function sendTelegram(text){
+  if(!state.tgToken || !state.tgChat) return {ok:false, error:'ยังไม่ได้ตั้งค่า Bot Token / Chat ID'};
+  const base = state.corsProxy ? state.corsProxy : 'https://api.telegram.org';
+  try{
+    const res = await fetch(`${base}/bot${state.tgToken}/sendMessage`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({chat_id: state.tgChat, text, parse_mode:'HTML'})
+    });
+    const j = await res.json();
+    if(!j.ok) return {ok:false, error: j.description || 'ส่งไม่สำเร็จ'};
+    return {ok:true};
+  }catch(e){
+    const hint = state.corsProxy
+      ? ' (ตรวจสอบว่า CORS Proxy URL ตั้งค่าถูกต้องและ deploy สำเร็จ)'
+      : ' — เบราว์เซอร์บล็อกการเรียก Telegram API โดยตรง (CORS) ต้องตั้งค่า "CORS Proxy URL" ก่อน ดูวิธีตั้งค่าได้จากคำแนะนำที่แชท';
+    return {ok:false, error: e.message + hint};
+  }
+}
+document.getElementById('testTelegram').onclick = async ()=>{
+  state.tgToken = document.getElementById('tgToken').value.trim();
+  state.tgChat = document.getElementById('tgChat').value.trim();
+  flashStatus('กำลังส่ง...', true);
+  const r = await sendTelegram('✅ ชี้ช่องรวย by โค้ชต้น💰 เชื่อมต่อสำเร็จ — พร้อมส่งสัญญาณเทรด');
+  flashStatus(r.ok ? 'ส่งข้อความทดสอบสำเร็จ ตรวจสอบ Telegram ของคุณ' : ('ผิดพลาด: '+r.error), r.ok);
+};
+
+// ---------- Browser notifications ----------
+document.getElementById('notifBtn').onclick = async ()=>{
+  if(!('Notification' in window)){ alert('เบราว์เซอร์นี้ไม่รองรับการแจ้งเตือน'); return; }
+  const p = await Notification.requestPermission();
+  document.getElementById('notifBtn').textContent = p==='granted' ? 'แจ้งเตือนเปิดอยู่ ✓' : 'ไม่ได้รับอนุญาต';
+};
+function notifyBrowser(sig){
+  if('Notification' in window && Notification.permission==='granted'){
+    new Notification(`${sig.side} ${sig.id}`, {
+      body: `Entry ${sig.entry} · TP ${sig.tp} · SL ${sig.sl}`
+    });
+  }
+}
+
+// ---------- Indicators ----------
+function calcEMA(values, period){
+  const k = 2/(period+1);
+  const out = new Array(values.length).fill(null);
+  let prev = values.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  out[period-1] = prev;
+  for(let i=period;i<values.length;i++){
+    prev = values[i]*k + prev*(1-k);
+    out[i] = prev;
+  }
+  return out;
+}
+function calcRSI(closes, period){
+  const out = new Array(closes.length).fill(null);
+  if(closes.length <= period) return out;
+  let gain=0, loss=0;
+  for(let i=1;i<=period;i++){
+    const d = closes[i]-closes[i-1];
+    if(d>=0) gain+=d; else loss-=d;
+  }
+  let avgGain=gain/period, avgLoss=loss/period;
+  out[period] = 100 - (100/(1+(avgLoss===0?100:avgGain/avgLoss)));
+  for(let i=period+1;i<closes.length;i++){
+    const d = closes[i]-closes[i-1];
+    const g = d>0?d:0, l = d<0?-d:0;
+    avgGain = (avgGain*(period-1)+g)/period;
+    avgLoss = (avgLoss*(period-1)+l)/period;
+    const rs = avgLoss===0?100:avgGain/avgLoss;
+    out[i] = 100 - (100/(1+rs));
+  }
+  return out;
+}
+function calcATR(bars, period){
+  const out = new Array(bars.length).fill(null);
+  const tr = bars.map((b,i)=>{
+    if(i===0) return b.h-b.l;
+    return Math.max(b.h-b.l, Math.abs(b.h-bars[i-1].c), Math.abs(b.l-bars[i-1].c));
+  });
+  if(bars.length <= period) return out;
+  let sum=0;
+  for(let i=0;i<period;i++) sum+=tr[i];
+  out[period-1]=sum/period;
+  for(let i=period;i<tr.length;i++){
+    out[i] = (out[i-1]*(period-1)+tr[i])/period;
+  }
+  return out;
+}
+function calcADX(bars, period){
+  // measures trend strength (0-100); low values = choppy/sideways market
+  const n = bars.length;
+  const out = new Array(n).fill(null);
+  if(n <= period+1) return out;
+  const tr=[0], plusDM=[0], minusDM=[0];
+  for(let i=1;i<n;i++){
+    const upMove = bars[i].h - bars[i-1].h;
+    const downMove = bars[i-1].l - bars[i].l;
+    plusDM.push((upMove>downMove && upMove>0) ? upMove : 0);
+    minusDM.push((downMove>upMove && downMove>0) ? downMove : 0);
+    tr.push(Math.max(bars[i].h-bars[i].l, Math.abs(bars[i].h-bars[i-1].c), Math.abs(bars[i].l-bars[i-1].c)));
+  }
+  const smooth = (arr)=>{
+    const s = new Array(n).fill(null);
+    let sum=0;
+    for(let i=1;i<=period;i++) sum+=arr[i];
+    s[period] = sum;
+    for(let i=period+1;i<n;i++) s[i] = s[i-1] - (s[i-1]/period) + arr[i];
+    return s;
+  };
+  const trS = smooth(tr), plusS = smooth(plusDM), minusS = smooth(minusDM);
+  const dx = new Array(n).fill(null);
+  for(let i=period;i<n;i++){
+    if(trS[i]===null || trS[i]===0) continue;
+    const plusDI = 100*(plusS[i]/trS[i]);
+    const minusDI = 100*(minusS[i]/trS[i]);
+    const sum = plusDI+minusDI;
+    dx[i] = sum===0 ? 0 : 100*Math.abs(plusDI-minusDI)/sum;
+  }
+  let firstAdxIdx = -1;
+  for(let i=period*2;i<n;i++){
+    if(dx[i]==null) continue;
+    if(firstAdxIdx===-1){
+      let sum=0, cnt=0;
+      for(let j=i-period+1;j<=i;j++){ if(dx[j]!=null){ sum+=dx[j]; cnt++; } }
+      out[i] = cnt? sum/cnt : null;
+      firstAdxIdx = i;
+    } else {
+      out[i] = ((out[i-1]*(period-1)) + dx[i]) / period;
+    }
+  }
+  return out;
+}
+
+// ---------- Demo data engine ----------
+function seedBars(cfg, n=90){
+  const bars=[];
+  let price = cfg.base;
+  for(let i=0;i<n;i++){
+    const drift = (Math.random()-0.5)*cfg.vol*price;
+    const o = price;
+    const c = price + drift;
+    const h = Math.max(o,c) + Math.random()*cfg.vol*price*0.4;
+    const l = Math.min(o,c) - Math.random()*cfg.vol*price*0.4;
+    bars.push({o,h,l,c});
+    price = c;
+  }
+  return bars;
+}
+function nextDemoBar(cfg, bars){
+  const last = bars[bars.length-1].c;
+  const drift = (Math.random()-0.5)*cfg.vol*last;
+  const o = last;
+  const c = Math.max(0.0001, last + drift);
+  const h = Math.max(o,c) + Math.random()*cfg.vol*last*0.4;
+  const l = Math.min(o,c) - Math.random()*cfg.vol*last*0.4;
+  return {o,h,l,c};
+}
+
+// ---------- Live data (TwelveData) ----------
+async function fetchLiveBars(cfg){
+  const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(cfg.tdSymbol)}&interval=5min&outputsize=100&apikey=${encodeURIComponent(state.tdKey)}`;
+  const res = await fetch(url);
+  const j = await res.json();
+  if(j.status === 'error' || !j.values) throw new Error(j.message || 'โหลดข้อมูลไม่สำเร็จ (ตรวจสอบสัญลักษณ์/แผน API — BTC/THB อาจไม่มีในบางแผน)');
+  return j.values.slice().reverse().map(v=>({o:+v.open,h:+v.high,l:+v.low,c:+v.close}));
+}
+
+// ---------- Signal engine ----------
+function evaluate(cfg){
+  const rec = state.data[cfg.id];
+  const bars = rec.bars;
+  if(bars.length < EMA_TREND+2) return;
+  const closes = bars.map(b=>b.c);
+  const emaFast = calcEMA(closes, EMA_FAST);
+  const emaSlow = calcEMA(closes, EMA_SLOW);
+  const emaTrend = calcEMA(closes, EMA_TREND);
+  const rsi = calcRSI(closes, RSI_LEN);
+  const atr = calcATR(bars, ATR_LEN);
+  const adx = calcADX(bars, ADX_LEN);
+  const i = bars.length-1;
+  rec.emaFast = emaFast[i]; rec.emaSlow = emaSlow[i]; rec.emaTrend = emaTrend[i];
+  rec.rsi = rsi[i]; rec.atr = atr[i]; rec.adx = adx[i];
+
+  if(emaFast[i-1]==null || emaSlow[i-1]==null || emaTrend[i]==null || rsi[i]==null || atr[i]==null) return;
+
+  const crossUp = emaFast[i-1] <= emaSlow[i-1] && emaFast[i] > emaSlow[i];
+  const crossDown = emaFast[i-1] >= emaSlow[i-1] && emaFast[i] < emaSlow[i];
+  const price = closes[i];
+  const trending = adx[i]!=null && adx[i] > ADX_THRESHOLD;
+  const uptrend = price > emaTrend[i];
+  const downtrend = price < emaTrend[i];
+
+  if(crossUp && rsi[i] < 70 && trending && uptrend){
+    fireSignal(cfg, 'BUY', price, atr[i]);
+  } else if(crossDown && rsi[i] > 30 && trending && downtrend){
+    fireSignal(cfg, 'SELL', price, atr[i]);
+  }
+}
+function fireSignal(cfg, side, price, atrVal){
+  const rec = state.data[cfg.id];
+  // cooldown: skip if same-side signal fired in the last 3 bars
+  if(rec.lastSignal && rec.lastSignal.side===side && rec.barsSinceSignal < 3) return;
+  const sl = side==='BUY' ? price - SL_ATR*atrVal : price + SL_ATR*atrVal;
+  const tp = side==='BUY' ? price + SL_ATR*RR*atrVal : price - SL_ATR*RR*atrVal;
+  const sig = {
+    id: cfg.id, side,
+    entry: price.toFixed(cfg.dec),
+    sl: sl.toFixed(cfg.dec),
+    tp: tp.toFixed(cfg.dec),
+    time: new Date()
+  };
+  rec.lastSignal = sig;
+  rec.barsSinceSignal = 0;
+  state.alerts.unshift(sig);
+  if(state.alerts.length>50) state.alerts.pop();
+  renderLog();
+  notifyBrowser(sig);
+  const emoji = side==='BUY' ? '🟢' : '🔴';
+  sendTelegram(`${emoji} <b>${side} ${cfg.id}</b> (${cfg.name})\nEntry: ${sig.entry}\nTP: ${sig.tp}\nSL: ${sig.sl}\nเวลา: ${sig.time.toLocaleTimeString('th-TH')}\n\n⚠️ สัญญาณจากอินดิเคเตอร์อัตโนมัติ ไม่ใช่คำแนะนำการลงทุน`);
+}
+
+// ---------- Rendering ----------
+function cardHTML(cfg){
+  return `
+    <div class="card-top">
+      <div class="id-block">
+        ${iconHTML(cfg.icon)}
+        <div><div class="id">${cfg.id}</div><div class="name">${cfg.name}</div></div>
+      </div>
+    </div>
+    <div class="price" id="price-${cfg.id}">--</div>
+    <div class="delta" id="delta-${cfg.id}"></div>
+    <canvas class="spark" id="spark-${cfg.id}" width="280" height="90"></canvas>
+    <div class="card-datetime" id="dt-${cfg.id}">--</div>
+    <div class="tf-row" id="tf-${cfg.id}">
+      ${TIMEFRAMES.map(tf=>`<button class="tf-btn ${tf.key==='5min'?'active':''}" data-tf="${tf.key}">${tf.label}</button>`).join('')}
+    </div>
+    <div class="meta-row">
+      <span>RSI <b id="rsi-${cfg.id}">--</b></span>
+      <span>ADX <b id="adx-${cfg.id}">--</b></span>
+      <span>Trend <b id="trend-${cfg.id}">--</b></span>
+    </div>
+    <div class="sig-box" id="sig-${cfg.id}">ยังไม่มีสัญญาณ — กำลังเฝ้าดูตลาด</div>
+  `;
+}
+function buildCards(){
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  CATEGORY_ORDER.forEach(cat=>{
+    const items = INSTRUMENTS.filter(i=>i.category===cat);
+    if(items.length===0) return;
+    const section = document.createElement('div');
+    section.className = 'category-section';
+    section.id = 'cat-'+cat;
+    section.innerHTML = `
+      <div class="category-header" data-cat="${cat}">
+        <div class="category-title">
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          ${CATEGORY_LABEL[cat]}
+        </div>
+        <span class="category-count">${items.length}</span>
+      </div>
+      <div class="category-grid" id="grid-${cat}"></div>
+    `;
+    grid.appendChild(section);
+    const subgrid = section.querySelector('.category-grid');
+    items.forEach(cfg=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.id = 'card-'+cfg.id;
+      card.innerHTML = cardHTML(cfg);
+      subgrid.appendChild(card);
+    });
+  });
+}
+async function loadCollapsedState(){
+  try{
+    const r = await appStorage.get('signal-desk-collapsed');
+    if(r && r.value){
+      JSON.parse(r.value).forEach(cat=>{
+        const el = document.getElementById('cat-'+cat);
+        if(el) el.classList.add('collapsed');
+      });
+    }
+  }catch(e){ /* no saved preference yet */ }
+}
+async function saveCollapsedState(){
+  const collapsed = CATEGORY_ORDER.filter(cat=>{
+    const el = document.getElementById('cat-'+cat);
+    return el && el.classList.contains('collapsed');
+  });
+  try{ await appStorage.set('signal-desk-collapsed', JSON.stringify(collapsed)); }catch(e){ /* ignore */ }
+}
+function drawSpark(id, closes){
+  const c = document.getElementById('spark-'+id);
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  const slice = closes.slice(-60);
+  if(slice.length<2) return;
+  const min = Math.min(...slice), max = Math.max(...slice);
+  const range = (max-min)||1;
+  const up = slice[slice.length-1] >= slice[0];
+  const color = up ? '#059669' : '#DC2626';
+  const pts = slice.map((v,idx)=>({
+    x: (idx/(slice.length-1))*c.width,
+    y: c.height - ((v-min)/range)*c.height*0.82 - 6
+  }));
+  // filled area under the line
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, c.height);
+  pts.forEach(p=> ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length-1].x, c.height);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0,0,0,c.height);
+  grad.addColorStop(0, color+'59');
+  grad.addColorStop(1, color+'02');
+  ctx.fillStyle = grad;
+  ctx.fill();
+  // line on top
+  ctx.beginPath();
+  pts.forEach((p,idx)=> idx===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+}
+function renderCard(cfg){
+  const rec = state.data[cfg.id];
+  const bars = rec.bars;
+  const closes = bars.map(b=>b.c);
+  const last = closes[closes.length-1];
+  const prev = closes[closes.length-2] ?? last;
+  const change = ((last-prev)/prev*100);
+  document.getElementById('price-'+cfg.id).textContent = last.toLocaleString('en-US',{minimumFractionDigits:cfg.dec, maximumFractionDigits:cfg.dec});
+  const deltaEl = document.getElementById('delta-'+cfg.id);
+  deltaEl.textContent = (change>=0?'+':'')+change.toFixed(3)+'%';
+  deltaEl.className = 'delta ' + (change>=0?'up':'down');
+  if(!rec.chartTF || rec.chartTF === '5min'){
+    drawSpark(cfg.id, closes);
+  }
+  document.getElementById('rsi-'+cfg.id).textContent = rec.rsi ? rec.rsi.toFixed(1) : '--';
+  const adxEl = document.getElementById('adx-'+cfg.id);
+  if(rec.adx!=null){
+    adxEl.textContent = rec.adx.toFixed(1);
+    adxEl.style.color = rec.adx > ADX_THRESHOLD ? 'var(--buy)' : 'var(--faint)';
+  }
+  const trendEl = document.getElementById('trend-'+cfg.id);
+  if(rec.emaFast!=null && rec.emaSlow!=null){
+    trendEl.textContent = rec.emaFast > rec.emaSlow ? 'ขาขึ้น' : 'ขาลง';
+    trendEl.style.color = rec.emaFast > rec.emaSlow ? 'var(--buy)' : 'var(--sell)';
+  }
+  const sigBox = document.getElementById('sig-'+cfg.id);
+  const card = document.getElementById('card-'+cfg.id);
+  card.classList.remove('signal-buy','signal-sell');
+  if(rec.lastSignal && rec.barsSinceSignal < 12){
+    const s = rec.lastSignal;
+    const cls = s.side==='BUY' ? 'buy' : 'sell';
+    card.classList.add('signal-'+cls);
+    sigBox.className = 'sig-box active '+cls;
+    sigBox.innerHTML = `
+      <div class="sig-head ${cls}">${s.side==='BUY'?'▲ BUY SIGNAL':'▼ SELL SIGNAL'}</div>
+      <div class="sig-grid">
+        <div><span>Entry</span><b>${s.entry}</b></div>
+        <div><span>TP</span><b>${s.tp}</b></div>
+        <div><span>SL</span><b>${s.sl}</b></div>
+      </div>`;
+  } else {
+    sigBox.className = 'sig-box';
+    sigBox.textContent = 'ยังไม่มีสัญญาณ — กำลังเฝ้าดูตลาด';
+  }
+}
+function renderTicker(){
+  const parts = INSTRUMENTS.map(cfg=>{
+    const rec = state.data[cfg.id];
+    if(!rec) return '';
+    const closes = rec.bars.map(b=>b.c);
+    const last = closes[closes.length-1];
+    const prev = closes[closes.length-2] ?? last;
+    const up = last>=prev;
+    return `<span class="tick-item"><b>${cfg.id}</b><span class="${up?'tick-up':'tick-down'}">${last.toLocaleString('en-US',{minimumFractionDigits:cfg.dec,maximumFractionDigits:cfg.dec})} ${up?'▲':'▼'}</span></span>`;
+  }).join('');
+  document.getElementById('tickerInner').innerHTML = parts + parts; // duplicate for seamless scroll
+}
+function renderLog(){
+  const log = document.getElementById('log');
+  if(state.alerts.length===0){ log.innerHTML = '<div class="log-empty">ยังไม่มีสัญญาณ — ระบบกำลังเฝ้าดูตลาด</div>'; return; }
+  log.innerHTML = state.alerts.map(s=>`
+    <div class="log-item">
+      <span class="log-dot ${s.side==='BUY'?'buy':'sell'}"></span>
+      <div class="log-body">
+        <b>${s.side} ${s.id}</b> — Entry ${s.entry} · TP ${s.tp} · SL ${s.sl}
+      </div>
+      <div class="log-time">${s.time.toLocaleTimeString('th-TH')}</div>
+    </div>
+  `).join('');
+}
+
+// ---------- Main loop ----------
+async function tick(){
+  for(const cfg of INSTRUMENTS){
+    let rec = state.data[cfg.id];
+    if(!rec){
+      rec = state.data[cfg.id] = {bars: seedBars(cfg), lastSignal:null, barsSinceSignal:99};
+    }
+    try{
+      if(state.mode==='live' && state.tdKey){
+        rec.bars = await fetchLiveBars(cfg);
+      } else {
+        rec.bars.push(nextDemoBar(cfg, rec.bars));
+        if(rec.bars.length>120) rec.bars.shift();
+      }
+      rec.barsSinceSignal = (rec.barsSinceSignal ?? 99) + 1;
+      evaluate(cfg);
+      renderCard(cfg);
+    }catch(e){
+      const sigBox = document.getElementById('sig-'+cfg.id);
+      if(sigBox) sigBox.textContent = 'ดึงข้อมูลไม่สำเร็จ: '+e.message;
+    }
+  }
+  renderTicker();
+}
+function restartLoop(){
+  if(state.timer) clearInterval(state.timer);
+  state.timer = setInterval(tick, state.intervalMs);
+}
+
+// ---------- Init ----------
+(async function init(){
+  await loadTheme();
+  buildCards();
+  document.getElementById('grid').addEventListener('click', (e)=>{
+    const header = e.target.closest('.category-header');
+    if(header){
+      header.closest('.category-section').classList.toggle('collapsed');
+      saveCollapsedState();
+      return;
+    }
+    const btn = e.target.closest('.tf-btn');
+    if(!btn) return;
+    const cardEl = btn.closest('.card');
+    const id = cardEl.id.replace('card-','');
+    const cfg = INSTRUMENTS.find(c=>c.id===id);
+    if(!cfg) return;
+    switchTimeframe(cfg, btn.dataset.tf, btn.parentElement);
+  });
+  await loadCollapsedState();
+  tickClocks();
+  setInterval(tickClocks, 1000);
+  await loadSettings();
+  await tick();
+  restartLoop();
+})();
+</script>
+</body>
+</html>
