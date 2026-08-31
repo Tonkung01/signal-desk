@@ -191,6 +191,7 @@
       </div>
     </div>
     <div class="head-actions">
+      <span class="mode-pill" id="activeHoursPill" style="display:none;">⏸ นอกช่วงเวลาทำงาน</span>
       <span class="mode-pill demo" id="modePill">DEMO DATA</span>
       <button class="btn" id="themeBtn">🌙 Dark Mode</button>
       <button class="btn" id="notifBtn">เปิดแจ้งเตือนเบราว์เซอร์</button>
@@ -247,7 +248,31 @@
           <option value="4000">ทุก 4 วินาที (เดโม, เร็ว)</option>
           <option value="15000" selected>ทุก 15 วินาที</option>
           <option value="60000">ทุก 60 วินาที</option>
+          <option value="300000">ทุก 5 นาที</option>
+          <option value="900000">ทุก 15 นาที</option>
+          <option value="1800000">ทุก 30 นาที</option>
+          <option value="3600000">ทุก 1 ชั่วโมง</option>
         </select>
+      </div>
+
+      <div class="field" style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line);">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="activeHoursEnabled" style="width:auto;accent-color:var(--gold);">
+          ใช้งานเฉพาะช่วงเวลาทำงาน (ประหยัดโควตา API)
+        </label>
+      </div>
+      <div id="activeHoursFields" style="display:none;">
+        <div class="row2">
+          <div class="field">
+            <label>เวลาเริ่ม</label>
+            <input type="time" id="activeStart" value="09:00">
+          </div>
+          <div class="field">
+            <label>เวลาสิ้นสุด</label>
+            <input type="time" id="activeEnd" value="18:00">
+          </div>
+        </div>
+        <p class="hint" style="margin-top:-6px;">นอกช่วงเวลานี้ ระบบจะหยุดดึงข้อมูล/สัญญาณโดยอัตโนมัติ แม้แท็บจะเปิดค้างไว้ก็ตาม รองรับช่วงข้ามเที่ยงคืน (เช่น 20:00–06:00)</p>
       </div>
     </div>
 
@@ -402,31 +427,11 @@ const FLAG = {
 };
 const INSTRUMENTS = [
   {id:'XAUUSD', name:'Gold Spot',    tdSymbol:'XAU/USD', base:2512.30, vol:0.0040, dec:2, category:'metals', icon:{type:'goldbar'}},
-  {id:'XAGUSD', name:'Silver Spot',  tdSymbol:'XAG/USD', base:29.40,   vol:0.0055, dec:3, category:'metals', icon:{type:'silverbar'}},
   {id:'BTCUSD', name:'Bitcoin',      tdSymbol:'BTC/USD', base:65200,   vol:0.0110, dec:0, category:'crypto', icon:{type:'btc'}},
-  {id:'BTCTHB', name:'Bitcoin/Baht', tdSymbol:'BTC/THB', base:2385000, vol:0.0112, dec:0, category:'crypto', icon:{type:'btc'}},
-  {id:'ETHUSD', name:'Ethereum',     tdSymbol:'ETH/USD', base:3450,    vol:0.0130, dec:2, category:'crypto', icon:{type:'eth'}},
   {id:'EURUSD', name:'Euro / USD',   tdSymbol:'EUR/USD', base:1.08650, vol:0.0018, dec:5, category:'forex', icon:{type:'flagpair', base:FLAG.EUR, quote:FLAG.USD}},
   {id:'GBPUSD', name:'Pound / USD',  tdSymbol:'GBP/USD', base:1.27150, vol:0.0020, dec:5, category:'forex', icon:{type:'flagpair', base:FLAG.GBP, quote:FLAG.USD}},
-  {id:'AUDUSD', name:'Aussie / USD', tdSymbol:'AUD/USD', base:0.66200, vol:0.0022, dec:5, category:'forex', icon:{type:'flagpair', base:FLAG.AUD, quote:FLAG.USD}},
   {id:'USDJPY', name:'USD / Yen',    tdSymbol:'USD/JPY', base:155.400, vol:0.0022, dec:3, category:'forex', icon:{type:'flagpair', base:FLAG.USD, quote:FLAG.JPY}},
-  {id:'USDTHB', name:'USD / Baht',   tdSymbol:'USD/THB', base:36.600,  vol:0.0016, dec:3, category:'forex', icon:{type:'flagpair', base:FLAG.USD, quote:FLAG.THB}},
   {id:'USOIL',  name:'WTI Crude',    tdSymbol:'WTI/USD', base:76.20,   vol:0.0060, dec:2, category:'energy', icon:{type:'oil', bg:'#2A2E35', fg:'#F4B740'}},
-  {id:'SPX500', name:'S&P 500',      tdSymbol:'SPX',     base:5580.0,  vol:0.0030, dec:1, category:'indices', icon:{type:'numcircle', value:'500', bg:'#DC2626', fg:'#FFFFFF'}},
-  {id:'NAS100', name:'Nasdaq 100',   tdSymbol:'IXIC',    base:19750.0, vol:0.0040, dec:1, category:'indices', icon:{type:'numcircle', value:'100', bg:'#1D8FE1', fg:'#FFFFFF'}},
-  {id:'NVDA',   name:'Nvidia',       tdSymbol:'NVDA',    base:180.0,   vol:0.0055, dec:2, category:'stocks', icon:{type:'logo', domain:'nvidia.com', mono:'N', bg:'#0F3D2A', fg:'#6EE7B7'}},
-  {id:'AAPL',   name:'Apple',        tdSymbol:'AAPL',    base:230.0,   vol:0.0030, dec:2, category:'stocks', icon:{type:'logo', domain:'apple.com', mono:'A', bg:'#2B2F36', fg:'#E5E7EB'}},
-  {id:'MSFT',   name:'Microsoft',    tdSymbol:'MSFT',    base:470.0,   vol:0.0028, dec:2, category:'stocks', icon:{type:'logo', domain:'microsoft.com', mono:'M', bg:'#0D2C4D', fg:'#93C5FD'}},
-  {id:'AMZN',   name:'Amazon',       tdSymbol:'AMZN',    base:225.0,   vol:0.0040, dec:2, category:'stocks', icon:{type:'logo', domain:'amazon.com', mono:'A', bg:'#4A2E05', fg:'#FCD34D'}},
-  {id:'GOOGL',  name:'Alphabet',     tdSymbol:'GOOGL',   base:195.0,   vol:0.0035, dec:2, category:'stocks', icon:{type:'logo', domain:'abc.xyz', mono:'G', bg:'#0D2C4D', fg:'#93C5FD'}},
-  {id:'INTC',   name:'Intel',        tdSymbol:'INTC',    base:35.0,    vol:0.0060, dec:2, category:'stocks', icon:{type:'logo', domain:'intel.com', mono:'I', bg:'#0D2C4D', fg:'#93C5FD'}},
-  {id:'AMD',    name:'AMD',          tdSymbol:'AMD',     base:165.0,   vol:0.0060, dec:2, category:'stocks', icon:{type:'logo', domain:'amd.com', mono:'AMD', bg:'#4A1414', fg:'#FCA5A5'}},
-  {id:'TSM',    name:'TSMC (ADR)',   tdSymbol:'TSM',     base:205.0,   vol:0.0035, dec:2, category:'stocks', icon:{type:'logo', domain:'tsmc.com', mono:'TSM', bg:'#2B2F36', fg:'#E5E7EB'}},
-  {id:'ASML',   name:'ASML (ADR)',   tdSymbol:'ASML',    base:780.0,   vol:0.0035, dec:2, category:'stocks', icon:{type:'logo', domain:'asml.com', mono:'AS', bg:'#4A1414', fg:'#FCA5A5'}},
-  {id:'SNDK',   name:'SanDisk',      tdSymbol:'SNDK',    base:55.0,    vol:0.0070, dec:2, category:'stocks', icon:{type:'logo', domain:'sandisk.com', mono:'SD', bg:'#2B2F36', fg:'#E5E7EB'}},
-  {id:'MU',     name:'Micron',       tdSymbol:'MU',      base:130.0,   vol:0.0065, dec:2, category:'stocks', icon:{type:'logo', domain:'micron.com', mono:'MU', bg:'#0F3D2A', fg:'#6EE7B7'}},
-  {id:'SKHY',   name:'SK Hynix (ADR)', tdSymbol:'SKHY',  base:163.0,   vol:0.0060, dec:2, category:'stocks', icon:{type:'logo', domain:'skhynix.com', mono:'SK', bg:'#2B2F36', fg:'#E5E7EB'}},
-  {id:'SPCX',   name:'SpaceX',       tdSymbol:'SPCX',    base:135.0,   vol:0.0060, dec:2, category:'stocks', icon:{type:'logo', domain:'spacex.com', mono:'SX', bg:'#4A2E05', fg:'#FCD34D'}},
 ];
 const CATEGORY_ORDER = ['metals','crypto','forex','energy','indices','stocks'];
 const CATEGORY_LABEL = {
@@ -467,6 +472,40 @@ function tickClocks(){
     const el = document.getElementById('dt-'+cfg.id);
     if(el) el.textContent = txt;
   });
+  updateActiveHoursPill();
+}
+
+// ---------- Active hours (save API credits outside chosen window) ----------
+function parseHHMM(str){
+  const parts = (str||'').split(':').map(Number);
+  if(parts.length<2 || isNaN(parts[0]) || isNaN(parts[1])) return null;
+  return parts[0]*60 + parts[1];
+}
+function isActiveNow(){
+  if(!state.activeHoursEnabled) return true;
+  const start = parseHHMM(state.activeStart);
+  const end = parseHHMM(state.activeEnd);
+  if(start==null || end==null || start===end) return true; // not configured -> default active
+  const now = new Date();
+  const nowMin = now.getHours()*60 + now.getMinutes();
+  if(start < end){
+    return nowMin >= start && nowMin < end;
+  }
+  // window wraps past midnight, e.g. 20:00-06:00
+  return nowMin >= start || nowMin < end;
+}
+function updateActiveHoursPill(){
+  const pill = document.getElementById('activeHoursPill');
+  if(!state.activeHoursEnabled){ pill.style.display = 'none'; return; }
+  const active = isActiveNow();
+  pill.style.display = 'inline-block';
+  if(active){
+    pill.textContent = `▶ กำลังทำงาน (${state.activeStart}–${state.activeEnd})`;
+    pill.className = 'mode-pill live';
+  } else {
+    pill.textContent = `⏸ นอกช่วงเวลาทำงาน (${state.activeStart}–${state.activeEnd})`;
+    pill.className = 'mode-pill demo';
+  }
 }
 async function fetchLiveBarsInterval(cfg, interval){
   const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(cfg.tdSymbol)}&interval=${interval}&outputsize=60&apikey=${encodeURIComponent(state.tdKey)}`;
@@ -503,6 +542,7 @@ let state = {
   mode: 'demo', // 'demo' | 'live'
   tdKey: '', tgToken: '', tgChat: '', corsProxy: '',
   intervalMs: 15000,
+  activeHoursEnabled: false, activeStart: '09:00', activeEnd: '18:00',
   timer: null,
   data: {}, // id -> {bars:[{o,h,l,c}], lastSignal: {...} or null}
   alerts: [],
@@ -544,6 +584,9 @@ async function loadSettings(){
       state.tgChat = s.tgChat || '';
       state.corsProxy = s.corsProxy || '';
       state.intervalMs = s.intervalMs || 15000;
+      state.activeHoursEnabled = !!s.activeHoursEnabled;
+      state.activeStart = s.activeStart || '09:00';
+      state.activeEnd = s.activeEnd || '18:00';
     }
   }catch(e){ /* no saved settings yet */ }
   document.getElementById('tdKey').value = state.tdKey;
@@ -551,18 +594,29 @@ async function loadSettings(){
   document.getElementById('tgChat').value = state.tgChat;
   document.getElementById('corsProxy').value = state.corsProxy;
   document.getElementById('intervalSel').value = String(state.intervalMs);
+  document.getElementById('activeHoursEnabled').checked = state.activeHoursEnabled;
+  document.getElementById('activeStart').value = state.activeStart;
+  document.getElementById('activeEnd').value = state.activeEnd;
+  document.getElementById('activeHoursFields').style.display = state.activeHoursEnabled ? 'block' : 'none';
   setMode(state.mode, false);
 }
+document.getElementById('activeHoursEnabled').onchange = (e)=>{
+  document.getElementById('activeHoursFields').style.display = e.target.checked ? 'block' : 'none';
+};
 async function saveSettings(){
   state.tdKey = document.getElementById('tdKey').value.trim();
   state.tgToken = document.getElementById('tgToken').value.trim();
   state.tgChat = document.getElementById('tgChat').value.trim();
   state.corsProxy = document.getElementById('corsProxy').value.trim().replace(/\/$/,'');
   state.intervalMs = Number(document.getElementById('intervalSel').value);
+  state.activeHoursEnabled = document.getElementById('activeHoursEnabled').checked;
+  state.activeStart = document.getElementById('activeStart').value || '09:00';
+  state.activeEnd = document.getElementById('activeEnd').value || '18:00';
   try{
     await appStorage.set('signal-desk-settings', JSON.stringify({
       mode: state.mode, tdKey: state.tdKey, tgToken: state.tgToken,
-      tgChat: state.tgChat, corsProxy: state.corsProxy, intervalMs: state.intervalMs
+      tgChat: state.tgChat, corsProxy: state.corsProxy, intervalMs: state.intervalMs,
+      activeHoursEnabled: state.activeHoursEnabled, activeStart: state.activeStart, activeEnd: state.activeEnd
     }));
     flashStatus('บันทึกการตั้งค่าแล้ว', true);
   }catch(e){ flashStatus('บันทึกไม่สำเร็จ: '+e.message, false); }
@@ -990,25 +1044,28 @@ function renderLog(){
 
 // ---------- Main loop ----------
 async function tick(){
+  const active = isActiveNow();
   for(const cfg of INSTRUMENTS){
     let rec = state.data[cfg.id];
     if(!rec){
       rec = state.data[cfg.id] = {bars: seedBars(cfg), lastSignal:null, barsSinceSignal:99};
     }
-    try{
-      if(state.mode==='live' && state.tdKey){
-        rec.bars = await fetchLiveBars(cfg);
-      } else {
-        rec.bars.push(nextDemoBar(cfg, rec.bars));
-        if(rec.bars.length>120) rec.bars.shift();
+    if(active){
+      try{
+        if(state.mode==='live' && state.tdKey){
+          rec.bars = await fetchLiveBars(cfg);
+        } else {
+          rec.bars.push(nextDemoBar(cfg, rec.bars));
+          if(rec.bars.length>120) rec.bars.shift();
+        }
+        rec.barsSinceSignal = (rec.barsSinceSignal ?? 99) + 1;
+        evaluate(cfg);
+      }catch(e){
+        const sigBox = document.getElementById('sig-'+cfg.id);
+        if(sigBox) sigBox.textContent = 'ดึงข้อมูลไม่สำเร็จ: '+e.message;
       }
-      rec.barsSinceSignal = (rec.barsSinceSignal ?? 99) + 1;
-      evaluate(cfg);
-      renderCard(cfg);
-    }catch(e){
-      const sigBox = document.getElementById('sig-'+cfg.id);
-      if(sigBox) sigBox.textContent = 'ดึงข้อมูลไม่สำเร็จ: '+e.message;
     }
+    renderCard(cfg); // always repaint (frozen on last known data when outside active hours)
   }
   renderTicker();
 }
