@@ -283,7 +283,7 @@
     </div>
   </div>
 
-  <footer>ชี้ช่องรวย by โค้ชต้น💰 · EMA(9/21) crossover + RSI(14) + ADX(14) + EMA(50) trend filter · ATR(14) for TP/SL · ไม่ใช่คำแนะนำการลงทุน</footer>
+  <footer>ชี้ช่องรวย by โค้ชต้น💰 · EMA(9/21) crossover + RSI(14) + ADX(14) filter · ATR(14) for TP/SL · ไม่ใช่คำแนะนำการลงทุน</footer>
 </div>
 
 <script>
@@ -442,9 +442,9 @@ const CATEGORY_LABEL = {
   indices: 'ดัชนี (Indices)',
   stocks:  'หุ้นรายตัว (Stocks)',
 };
-const EMA_FAST=9, EMA_SLOW=21, EMA_TREND=50, RSI_LEN=14, ATR_LEN=14, ADX_LEN=14, ADX_THRESHOLD=20;
+const EMA_FAST=9, EMA_SLOW=21, RSI_LEN=14, ATR_LEN=14, ADX_LEN=14, ADX_THRESHOLD=15;
 const RR = 2; // reward:risk multiple for TP relative to SL (in ATR units)
-const SL_ATR = 2;
+const SL_ATR = 1.5;
 
 // ---------- Chart timeframe selector ----------
 const TIMEFRAMES = [
@@ -816,30 +816,27 @@ async function fetchLiveBars(cfg){
 function evaluate(cfg){
   const rec = state.data[cfg.id];
   const bars = rec.bars;
-  if(bars.length < EMA_TREND+2) return;
+  if(bars.length < EMA_SLOW+2) return;
   const closes = bars.map(b=>b.c);
   const emaFast = calcEMA(closes, EMA_FAST);
   const emaSlow = calcEMA(closes, EMA_SLOW);
-  const emaTrend = calcEMA(closes, EMA_TREND);
   const rsi = calcRSI(closes, RSI_LEN);
   const atr = calcATR(bars, ATR_LEN);
   const adx = calcADX(bars, ADX_LEN);
   const i = bars.length-1;
-  rec.emaFast = emaFast[i]; rec.emaSlow = emaSlow[i]; rec.emaTrend = emaTrend[i];
+  rec.emaFast = emaFast[i]; rec.emaSlow = emaSlow[i];
   rec.rsi = rsi[i]; rec.atr = atr[i]; rec.adx = adx[i];
 
-  if(emaFast[i-1]==null || emaSlow[i-1]==null || emaTrend[i]==null || rsi[i]==null || atr[i]==null) return;
+  if(emaFast[i-1]==null || emaSlow[i-1]==null || rsi[i]==null || atr[i]==null) return;
 
   const crossUp = emaFast[i-1] <= emaSlow[i-1] && emaFast[i] > emaSlow[i];
   const crossDown = emaFast[i-1] >= emaSlow[i-1] && emaFast[i] < emaSlow[i];
   const price = closes[i];
   const trending = adx[i]!=null && adx[i] > ADX_THRESHOLD;
-  const uptrend = price > emaTrend[i];
-  const downtrend = price < emaTrend[i];
 
-  if(crossUp && rsi[i] < 70 && trending && uptrend){
+  if(crossUp && rsi[i] < 70 && trending){
     fireSignal(cfg, 'BUY', price, atr[i]);
-  } else if(crossDown && rsi[i] > 30 && trending && downtrend){
+  } else if(crossDown && rsi[i] > 30 && trending){
     fireSignal(cfg, 'SELL', price, atr[i]);
   }
 }
