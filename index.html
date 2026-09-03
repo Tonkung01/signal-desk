@@ -290,7 +290,7 @@
     </div>
   </div>
 
-  <footer>ชี้ช่องรวย by โค้ชต้น💰 · EMA(9/21) crossover + RSI(14) + ADX(14) filter · ATR(14) for TP/SL · ไม่ใช่คำแนะนำการลงทุน</footer>
+  <footer>ชี้ช่องรวย by โค้ชต้น💰 · EMA(50) trend filter + ADX(14)>25 + entry: RSI(14) zone/cross OR EMA(9/21) crossover · ATR(14) for TP/SL · Timeframe M15 · ไม่ใช่คำแนะนำการลงทุน</footer>
 </div>
 
 <script>
@@ -449,7 +449,10 @@ const CATEGORY_LABEL = {
   indices: 'ดัชนี (Indices)',
   stocks:  'หุ้นรายตัว (Stocks)',
 };
-const EMA_FAST=9, EMA_SLOW=21, RSI_LEN=14, ATR_LEN=14, ADX_LEN=14, ADX_THRESHOLD=15;
+const EMA_FAST=9, EMA_SLOW=21, EMA_TREND=50, RSI_LEN=14, ATR_LEN=14, ADX_LEN=14, ADX_THRESHOLD=25;
+const RSI_ZONE_LOOKBACK=5;        // bars to look back for "RSI was in the pullback zone"
+const RSI_BUY_ZONE=[40,50], RSI_SELL_ZONE=[50,60];
+const RSI_OVERSOLD=30, RSI_OVERBOUGHT=70;
 const RR = 2; // reward:risk multiple for TP relative to SL (in ATR units)
 const SL_ATR = 1.5;
 
@@ -812,7 +815,7 @@ function nextDemoBar(cfg, bars){
 
 // ---------- Live data (TwelveData) ----------
 async function fetchLiveBars(cfg){
-  const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(cfg.tdSymbol)}&interval=5min&outputsize=100&apikey=${encodeURIComponent(state.tdKey)}`;
+  const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(cfg.tdSymbol)}&interval=15min&outputsize=100&apikey=${encodeURIComponent(state.tdKey)}`;
   const res = await fetch(url);
   const j = await res.json();
   if(j.status === 'error' || !j.values) throw new Error(j.message || 'โหลดข้อมูลไม่สำเร็จ (ตรวจสอบสัญลักษณ์/แผน API — BTC/THB อาจไม่มีในบางแผน)');
@@ -820,31 +823,60 @@ async function fetchLiveBars(cfg){
 }
 
 // ---------- Signal engine ----------
+// Step 1: EMA50 sets allowed direction (price above = BUY-only, below = SELL-only)
+// Step 2: ADX must be > 25 (real trend, not sideways/forming)
+// Step 3: RSI triggers entry -> pullback-into-zone-then-bounce, OR oversold/overbought cross
+function inZoneWithinLookback(rsiArr, endIdx, lo, hi, lookback){
+  for(let j=Math.max(0,endIdx-lookback); j<endIdx; j++){
+    if(rsiArr[j]!=null && rsiArr[j]>=lo && rsiArr[j]<=hi) return true;
+  }
+  return false;
+}
 function evaluate(cfg){
   const rec = state.data[cfg.id];
   const bars = rec.bars;
-  if(bars.length < EMA_SLOW+2) return;
+  if(bars.length < EMA_TREND+RSI_ZONE_LOOKBACK+2) return;
   const closes = bars.map(b=>b.c);
   const emaFast = calcEMA(closes, EMA_FAST);
   const emaSlow = calcEMA(closes, EMA_SLOW);
+  const emaTrend = calcEMA(closes, EMA_TREND);
   const rsi = calcRSI(closes, RSI_LEN);
   const atr = calcATR(bars, ATR_LEN);
   const adx = calcADX(bars, ADX_LEN);
   const i = bars.length-1;
-  rec.emaFast = emaFast[i]; rec.emaSlow = emaSlow[i];
+  rec.emaFast = emaFast[i]; rec.emaSlow = emaSlow[i]; rec.emaTrend = emaTrend[i];
   rec.rsi = rsi[i]; rec.atr = atr[i]; rec.adx = adx[i];
 
-  if(emaFast[i-1]==null || emaSlow[i-1]==null || rsi[i]==null || atr[i]==null) return;
+  if(emaTrend[i]==null || emaFast[i]==null || emaSlow[i]==null || emaFast[i-1]==null || emaSlow[i-1]==null || rsi[i]==null || rsi[i-1]==null || atr[i]==null || adx[i]==null) return;
 
-  const crossUp = emaFast[i-1] <= emaSlow[i-1] && emaFast[i] > emaSlow[i];
-  const crossDown = emaFast[i-1] >= emaSlow[i-1] && emaFast[i] < emaSlow[i];
   const price = closes[i];
-  const trending = adx[i]!=null && adx[i] > ADX_THRESHOLD;
+  // Step 1: direction from EMA50
+  const direction = price > emaTrend[i] ? 'UP' : (price < emaTrend[i] ? 'DOWN' : 'NONE');
+  // Step 2: trend strength from ADX (>25 = tradeable trend; <=25 = sideways/forming -> no trade)
+  const trending = adx[i] > ADX_THRESHOLD;
+  // EMA(9/21) momentum must also align with the trade direction
+  const momentumUp = emaFast[i] > emaSlow[i];
+  const momentumDown = emaFast[i] < emaSlow[i];
+  // fresh EMA(9/21) crossover this bar -- an entry trigger on its own
+  const emaCrossUp = emaFast[i-1] <= emaSlow[i-1] && emaFast[i] > emaSlow[i];
+  const emaCrossDown = emaFast[i-1] >= emaSlow[i-1] && emaFast[i] < emaSlow[i];
+  if(!trending || direction==='NONE') return;
 
-  if(crossUp && rsi[i] < 70 && trending){
-    fireSignal(cfg, 'BUY', price, atr[i]);
-  } else if(crossDown && rsi[i] > 30 && trending){
-    fireSignal(cfg, 'SELL', price, atr[i]);
+  // Step 3: entry trigger -- RSI pullback/cross, OR a fresh EMA(9/21) crossover
+  if(direction==='UP' && momentumUp){
+    const bouncedFromZone = inZoneWithinLookback(rsi, i, RSI_BUY_ZONE[0], RSI_BUY_ZONE[1], RSI_ZONE_LOOKBACK)
+      && rsi[i-1] <= 50 && rsi[i] > 50;
+    const oversoldCross = rsi[i-1] <= RSI_OVERSOLD && rsi[i] > RSI_OVERSOLD;
+    if(bouncedFromZone || oversoldCross || emaCrossUp){
+      fireSignal(cfg, 'BUY', price, atr[i]);
+    }
+  } else if(direction==='DOWN' && momentumDown){
+    const bouncedFromZone = inZoneWithinLookback(rsi, i, RSI_SELL_ZONE[0], RSI_SELL_ZONE[1], RSI_ZONE_LOOKBACK)
+      && rsi[i-1] >= 50 && rsi[i] < 50;
+    const overboughtCross = rsi[i-1] >= RSI_OVERBOUGHT && rsi[i] < RSI_OVERBOUGHT;
+    if(bouncedFromZone || overboughtCross || emaCrossDown){
+      fireSignal(cfg, 'SELL', price, atr[i]);
+    }
   }
 }
 function fireSignal(cfg, side, price, atrVal){
@@ -884,7 +916,7 @@ function cardHTML(cfg){
     <canvas class="spark" id="spark-${cfg.id}" width="280" height="90"></canvas>
     <div class="card-datetime" id="dt-${cfg.id}">--</div>
     <div class="tf-row" id="tf-${cfg.id}">
-      ${TIMEFRAMES.map(tf=>`<button class="tf-btn ${tf.key==='5min'?'active':''}" data-tf="${tf.key}">${tf.label}</button>`).join('')}
+      ${TIMEFRAMES.map(tf=>`<button class="tf-btn ${tf.key==='15min'?'active':''}" data-tf="${tf.key}">${tf.label}</button>`).join('')}
     </div>
     <div class="meta-row">
       <span>RSI <b id="rsi-${cfg.id}">--</b></span>
@@ -986,7 +1018,7 @@ function renderCard(cfg){
   const deltaEl = document.getElementById('delta-'+cfg.id);
   deltaEl.textContent = (change>=0?'+':'')+change.toFixed(3)+'%';
   deltaEl.className = 'delta ' + (change>=0?'up':'down');
-  if(!rec.chartTF || rec.chartTF === '5min'){
+  if(!rec.chartTF || rec.chartTF === '15min'){
     drawSpark(cfg.id, closes);
   }
   document.getElementById('rsi-'+cfg.id).textContent = rec.rsi ? rec.rsi.toFixed(1) : '--';
@@ -996,9 +1028,10 @@ function renderCard(cfg){
     adxEl.style.color = rec.adx > ADX_THRESHOLD ? 'var(--buy)' : 'var(--faint)';
   }
   const trendEl = document.getElementById('trend-'+cfg.id);
-  if(rec.emaFast!=null && rec.emaSlow!=null){
-    trendEl.textContent = rec.emaFast > rec.emaSlow ? 'ขาขึ้น' : 'ขาลง';
-    trendEl.style.color = rec.emaFast > rec.emaSlow ? 'var(--buy)' : 'var(--sell)';
+  if(rec.emaTrend!=null){
+    const last = rec.bars[rec.bars.length-1].c;
+    trendEl.textContent = last > rec.emaTrend ? 'ขาขึ้น (>EMA50)' : 'ขาลง (<EMA50)';
+    trendEl.style.color = last > rec.emaTrend ? 'var(--buy)' : 'var(--sell)';
   }
   const sigBox = document.getElementById('sig-'+cfg.id);
   const card = document.getElementById('card-'+cfg.id);
